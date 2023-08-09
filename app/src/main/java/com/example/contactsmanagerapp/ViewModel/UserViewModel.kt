@@ -34,17 +34,30 @@ class UserViewModel(private val repository: UserRepository): ViewModel(), Observ
     }
 
     fun saveOrUpdate(){
-        val name = inputName.value!!
-        val email = inputEmail.value!!
+        if(isUpdateOrDelete){
+            //Make Update:
+            userToUpdateOrDelete.name  = inputName.value!!
+            userToUpdateOrDelete.email = inputEmail.value!!
+            update(userToUpdateOrDelete)
+        }else{
+            //Insert functionality
+            val name = inputName.value!!
+            val email = inputEmail.value!!
 
-        insert(User(0, name, email))
+            insert(User(0, name, email))
 
-        inputName.value = null
-        inputEmail.value = null
+            inputName.value = null
+            inputEmail.value = null
+        }
+
     }
 
     fun clearAllorDelete(){
-        clearAll()
+        if (isUpdateOrDelete){
+            delete(userToUpdateOrDelete)
+        }else {
+            clearAll()
+        }
     }
 
     fun insert(user:User) = viewModelScope.launch{
@@ -55,11 +68,37 @@ class UserViewModel(private val repository: UserRepository): ViewModel(), Observ
     }
     fun update(user: User) = viewModelScope.launch{
         repository.update(user)
+            //Resetting the Buttons and Fields.
+            inputName.value = null
+            inputEmail.value = null
+            isUpdateOrDelete = false
+            saveOrUpdateButtonText.value = "Save"
+            clearAllOrDeleteButtonText.value = "Clear All"
+
+
     }
     fun delete(user: User) = viewModelScope.launch{
         repository.delete(user)
+        //Resetting the Buttons and Fields.
+        inputName.value = null
+        inputEmail.value = null
+        isUpdateOrDelete = false
+        saveOrUpdateButtonText.value = "Save"
+        clearAllOrDeleteButtonText.value = "Clear All"
+
     }
 
+    fun initUpdateAndDelete(user:User){
+        //Resetting the Buttons and Fields.
+        inputName.value = user.name
+        inputEmail.value = user.email
+        isUpdateOrDelete = true
+        userToUpdateOrDelete = user
+        saveOrUpdateButtonText.value = "Update"
+        clearAllOrDeleteButtonText.value = "Delete"
+
+
+    }
     //Not doing anything because we have used the nullable.
     override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback?) {
 
