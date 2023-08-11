@@ -1,4 +1,4 @@
-package com.example.contactsmanagerapp.ViewModel
+package com.example.contactsmanagerapp.myviewModel
 
 //Use observable of the data-binding library not the android one.
 import androidx.databinding.Bindable
